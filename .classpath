@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/cglib-nodep-3.2.4.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/client-combined-3.0.1-nodeps.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/commons-collections4-4.1.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/commons-exec-1.3.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/commons-io-2.5.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/commons-lang3-3.4.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/cssparser-0.9.20.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/curvesapi-1.04.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/gson-2.3.1.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/guava-19.0.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/hamcrest-core-1.3.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/hamcrest-library-1.3.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/htmlunit-2.23.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/htmlunit-core-js-2.23.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/httpclient-4.5.2.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/httpcore-4.4.4.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/httpmime-4.5.2.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/javax.servlet-api-3.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/jetty-io-9.2.13.v20150730.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/jetty-util-9.2.13.v20150730.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/jna-4.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/jna-platform-4.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/junit-4.12.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/neko-htmlunit-2.23.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/netty-3.5.7.Final.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/phantomjsdriver-1.3.0.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/poi-3.16-beta1.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/poi-examples-3.16-beta1.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/poi-excelant-3.16-beta1.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/poi-ooxml-3.16-beta1.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/poi-ooxml-schemas-3.16-beta1.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/poi-scratchpad-3.16-beta1.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/sac-1.3.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/serializer-2.7.2.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/websocket-api-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/websocket-client-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/websocket-common-9.2.15.v20160210.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/xalan-2.7.2.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/xercesImpl-2.11.0.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/xml-apis-1.4.01.jar"/>
+	<classpathentry kind="lib" path="C:/E_FrameWork/Automation JARS_Drivers/Jars/xmlbeans-2.6.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

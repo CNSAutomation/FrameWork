@@ -11,27 +11,33 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.WebDriver;
-
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
-
 import org.openqa.selenium.support.ui.Select;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+
 
 public class E_FrameWork 
 {
@@ -52,34 +58,59 @@ public class E_FrameWork
 	int dpass=0,dfail=0,dexecution=0;
 	// END : #Variable Declaration Section
 	
+	//Browser_Selection
+	int brow=0;
 	
 	//Test Data File
 	File file;
 	FileInputStream inputStream;
 	XSSFWorkbook srcBook;
 	XSSFSheet sourceSheet;
-	XSSFRow rowsline,rowslineSearch;
+	XSSFRow rowsline,rowslineSearchColumn,rowslineSearch;
 	FileOutputStream outputStream;
 	
+	//Tab Switch
+	 ArrayList<String> tabs2;
+	//Default PAth
+	String ClassNm1;
+	
+	public static void main(String args[])
+	{
+		
+	}
     public void EReport_CreateHTMLReport(String ClassName)throws Exception
     {
     	if(iterationPoint==0)
     	{
-        	String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd-yyyy "));//HH:mm:ss
-    		String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern(" HH-mm-ss "));
-    		File fh = new File("C:\\E_FrameWork\\HTML_Report_Template\\"+ClassName+"_DATE_"+date+" & TIME_"+time+".html");
+        	String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd-yyyy"));//HH:mm:ss
+    		String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH-mm-ss"));
+    		//File fh = new File("C:\\E_FrameWork\\HTML_Report_Template\\"+ClassName+"_DATE_"+date+" & TIME_"+time+".html");
+    		File fh = new File(ClassName+"_DATE_"+date+" & TIME_"+time+".html");
     		bwhtml = new BufferedWriter(new FileWriter(fh));
     		iterationPoint++;
     		
     	}
-    	if(dpass!=0)
+    	//if(dpass!=0)
+    	//{
+    	//	EReport_Stat();
+    	//}
+    	if(StepNo!=0)
     	{
     		EReport_Stat();
     	}
-		//Start - Writing HTML Template
-		String Hearder="</table><br><h1>Component : "+ClassName+"</h1>"
+		//Start - Writing HTML Template   Add Reserve
+    	
+    	//To get Exact Class Name
+    	StringBuffer buffer = new StringBuffer(ClassName);  
+    	
+    	String ClassNm = StringUtils.substringBefore(buffer.reverse().toString(), "\\");
+    	
+    	buffer = new StringBuffer(ClassNm);
+    	buffer.reverse();
+    	    	
+		String Hearder="</table><br><h1>Component : "+buffer.toString()+"</h1>"
 				+ "<br>"
-				+ "<table border=\"1\" style=\"width:70%\">"
+				+ "<table align=\"center\"  border=\"1\" style=\"width:70%\">"
 				+ "<tr>"
 				+ "<th style=\"width:10%\" bgcolor=\"#AFAAA9\">Step No.</th>"
 				+ "<th style=\"width:20%\" bgcolor=\"#AFAAA9\">Object Name</th>"
@@ -90,13 +121,15 @@ public class E_FrameWork
 		dpass=0;
 		dfail=0;
 		dexecution=0;
+		
+		ClassNm1=ClassName;
 		//END - Writing HTML Template
     }
     public void EReport_Stat() throws IOException
     {
     	int tot=dpass+dfail+dexecution;
 		String Statuz="</table><br>"
-				+ "<table border=\"0\" style=\"width:50%\">"
+				+ "<table align=\"center\" border=\"0\"  style=\"width:50%\">"
 				+ "<tr>"
 				+ "<th style=\"width:4%\" bgcolor=\"#AFAAA9\"></th>"
 				+ "<th style=\"width:28%\" align=\"left\">TOTAL(Test Steps) : <b>"+tot+"</b></th>"
@@ -118,6 +151,7 @@ public class E_FrameWork
 				+ "<th style=\"width:26%\" align=\"left\"><b>("+Math.round((float)(dexecution*100)/tot)+"%)</b></th>"
 				+ "</tr>";
 		bwhtml.write(Statuz);
+		
     }
     public void EReport_UpdateHTMLReport(String WebObjectName, String Action, String Result)throws Exception
     {
@@ -140,17 +174,40 @@ public class E_FrameWork
 		}
 		else if(Result=="FAIL")
 		{
-			String dateSS = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd-yyyy "));//HH:mm:ss
-    		String timeSS = LocalDateTime.now().format(DateTimeFormatter.ofPattern(" HH-mm-ss "));
-    		String NameAndTime = driver.getTitle()+"_DATE_"+dateSS+" & TIME_"+timeSS;
-			E_TakeScreenShot("C:\\E_FrameWork\\ScreenShots", NameAndTime);
+			String dateSS = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd-yyyy"));//HH:mm:ss
+    		String timeSS = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH-mm-ss"));
+    		
+    		String DriverTitle = RemoveAllSpecialCharacters(driver.getTitle()+":");
+    		
+    		
+    		
+    				
+    		String NameAndTime = DriverTitle+"_DATE_"+dateSS+" & TIME_"+timeSS;
+    		
+    		//new Lines
+        	StringBuffer buffer = new StringBuffer(ClassNm1);  
+        	
+        	String ClassNm = buffer.reverse().toString();
+        	
+        	ClassNm = ClassNm.substring(ClassNm.indexOf('\\')+1);
+        	
+        	buffer = new StringBuffer(ClassNm);
+        	buffer.reverse();
+        	
+    		//new Lines
+    		
+    	
+    		//buffer.toString().replace("\\Result", "");
+    		
+			E_TakeScreenShot(buffer.toString().replace("\\Result", "")+"\\ScreenShots", NameAndTime);
 			
-			String IssueSnapLink = "C:\\E_FrameWork\\ScreenShots\\"+NameAndTime+".jpg";
-
+			String IssueSnapLink = buffer.toString().replace("\\Result", "")+"\\ScreenShots\\"+NameAndTime+".jpg";
+			
 			DataTest2="<td align=\"center\" bgcolor=\"#FF0000\"><a href=\""+IssueSnapLink+"\">"+Result+"</a></th>"
 					+ "</tr>";
 			dfail=dfail+1;
-			checkfail=1;
+			//checkfail=1;
+			
 		}else
 		{
 			DataTest2="<td align=\"center\">"+Result+"</th>"
@@ -162,6 +219,7 @@ public class E_FrameWork
 		bwhtml.write(DataTest2);	
 		if(checkfail==1)
 		{
+			//EReport_Stat();
 			EReport_CloseHTMLReport();
 			System.exit(0);
 		}
@@ -171,6 +229,11 @@ public class E_FrameWork
     	EReport_Stat();
     	bwhtml.close();
     }
+    //START : #0 BROWSER SELECTION
+    public void E_Browser_Selection(Integer broww) throws Exception
+    {
+    	brow = broww;
+    }
     //START : #1 Browser Selection and Load URL
     public void E_LoadURL(String url) throws Exception
     {
@@ -178,8 +241,8 @@ public class E_FrameWork
 	    	{
 	    		String browser = null;
 	    		try{
-		    		int brow=0;
-			    	
+		    		
+			    	/*
 			    	System.out.println("\n   = = = Select Browser = = = ");
 			    	System.out.println("\t1. for Firefox");
 			    	System.out.println("\t2. for IE");
@@ -189,14 +252,18 @@ public class E_FrameWork
 
 			    	BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			    	brow = Integer.parseInt(in.readLine());
-			    	
-			    	if(brow>=1 && brow<=3)
+			    	*/
+		    		
+			    	//brow=Integer.parseInt(objpro.getProperty("Browser"));
+
+			    	if(brow>=1 && brow<=4)
 			    	{
 			    		switch(brow)
 			    		{
 			    			case 1:
 			    				//Firefox
 			    				System.setProperty("webdriver.gecko.driver", "C:\\E_FrameWork\\Automation JARS_Drivers\\Browser Drivers\\geckodriver.exe");
+			    				System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
 			    				
 			    			break;
 			    			case 2:
@@ -209,24 +276,33 @@ public class E_FrameWork
 			    				//Chrome
 			    				System.setProperty("webdriver.chrome.driver", "C:\\E_FrameWork\\Automation JARS_Drivers\\Browser Drivers\\chromedriver.exe");
 			    			break;
+			    			case 4:
+			    				//Edge
+			    				System.setProperty("webdriver.edge.driver", "C:\\E_FrameWork\\Automation JARS_Drivers\\Browser Drivers\\MicrosoftWebDriver_3.exe");
+			    			break;
 			    		}
 			    		
 			    		if(brow==1)
 			    		{
 			    			driver=new FirefoxDriver();
-			    			browser="Firefox";
+			    			browser="\"Firefox\" Browser";
 			    		}
 			    		else if(brow==2)
 			    		{
 			    			driver=new InternetExplorerDriver();
-			    			browser="Internet Explorer";
+			    			browser="\"Internet Explorer\" Browser";
 			    		}
 			    		else if(brow==3)
 			    		{
 			    			driver=new ChromeDriver();
-			    			browser="Chrome";
+			    			browser="\"Chrome\" Browser";
 			    		}
-			    		driver.manage().window().maximize();
+			    		else if(brow==4)
+			    		{
+				    		driver = new EdgeDriver();
+				    		browser = "\"Windows Edge\" Browser";
+			    		}
+
 			    	}
 			    	else
 			    	{
@@ -243,13 +319,18 @@ public class E_FrameWork
 		    		System.exit(0);
 		    	}
 	    		try{
+	    			driver.manage().window().maximize();
 	    			driver.get(Eexcel_HashCheck(url));
 			    	System.out.println("\nInvoke \""+browser+"\" Browser, Opening \'"+Eexcel_HashCheck(url)+"\' URL.");
 			    	EReport_UpdateHTMLReport(browser,"Invoke \""+browser+"\" Browser","PASS");
-	    		}catch(org.openqa.selenium.InvalidArgumentException IAE){
+			    	EReport_UpdateHTMLReport(browser,"Opening \""+Eexcel_HashCheck(url)+"\" URL.","PASS");
+	    		}catch(org.openqa.selenium.InvalidArgumentException | java.lang.NullPointerException IAE){
 	    			System.out.println("\nInvalid URL, cannot open ["+Eexcel_HashCheck(url)+"] this URL.");
 	    			EReport_UpdateHTMLReport(browser,"Invoke \""+browser+"\" Browser","FAIL");
-	    			System.exit(0);
+	    			EReport_UpdateHTMLReport(browser,"Opening \""+Eexcel_HashCheck(url)+"\" URL.","FAIL");
+	    			throw new java.io.FileNotFoundException("");
+	    			
+	    			//System.exit(0);
 	    		}
 	    	}
 	    	else
@@ -257,29 +338,51 @@ public class E_FrameWork
 	    		try{
 	    		driver.navigate().to(Eexcel_HashCheck(url));
 	    		System.out.println("\nRedirected to : \'"+Eexcel_HashCheck(url)+"\' URL.");
-	    		EReport_UpdateHTMLReport("Nevigation","Redirect URL to :"+Eexcel_HashCheck(url),"PASS");
+	    		EReport_UpdateHTMLReport("Navigation","Redirect URL to :"+Eexcel_HashCheck(url),"PASS");
 	    		}catch(org.openqa.selenium.InvalidArgumentException IAE){
 	    			System.out.println("\nInvalid URL, cannot redirect to ["+Eexcel_HashCheck(url)+"] this URL.");
-	    			EReport_UpdateHTMLReport("Nevigation","Redirect URL to :"+Eexcel_HashCheck(url),"FAIL");
-	    			System.exit(0);
+	    			EReport_UpdateHTMLReport("Navigation","Redirect URL to :"+Eexcel_HashCheck(url),"FAIL");
+	    			//System.exit(0);
 	    		}
 	    	}
     }
     //END : #1 Browser Selection and Load URL
     
     //-------------------------------------------------------------------
-    
+    public String RemoveAllSpecialCharacters(String sstring)
+    {
+    //	String[] specialchars = {"~","`","!","@","#","£","€","$","¢","¥","§","%","°","^","&","*","(",")","-","_","+","=","{","}","[","]","|","\\","/",":",";","\"","\'","<",">",",",".","?"};
+
+    	String FN1,FN2,FN3,FN4,FN5,FN6,FN7,FN8,FN9,FN10,FN11;
+    	FN1=sstring.replace("\\","");
+    	FN2=FN1.replace("\'", "");
+    	FN3=FN2.replace("\"", "");
+    	FN4=FN3.replace("/", "");
+    	FN5=FN4.replace(":", "");
+    	FN6=FN5.replace("*", "");
+    	FN7=FN6.replace("?", "");
+    	FN8=FN7.replace("<", "");
+    	FN9=FN8.replace(">", "");
+    	FN10=FN9.replace("|", "");
+    	FN11=FN10.replace("  ", "");
+    	/*for(int i=0;i<=specialchars.length-1;i++)
+    	{
+    		tempString = sstring.replace(specialchars[i], "");
+    		
+    	}*/
+    	return FN11;
+    }
     //START : #2 CallWebObjectsFile
     public void E_CallWebObjectsFile(String WebObjectFileName)throws Exception
     {
     	try{
         	objpro = new Properties();
-        	objfile = new FileInputStream("C:\\E_FrameWork\\WebObject Repository\\"+WebObjectFileName+".properties");
-        	System.out.println("\"C:\\E_FrameWork\\WebObject Repository\\"+WebObjectFileName+".properties\" Properties File Loaded.");
+        	objfile = new FileInputStream(WebObjectFileName);
+        	System.out.println("\""+WebObjectFileName+"\" Properties File Loaded.");
         	objpro.load(objfile); 
     	}catch(FileNotFoundException FNFE)
     	{
-    		System.out.println("\nFile \""+WebObjectFileName+"\" Not Found At \"C:\\E_FrameWork\\WebObject Repository\\\" Location.");
+    		System.out.println("\nFile \""+WebObjectFileName+"\" Not Found.");
     	}
     	
     }
@@ -305,6 +408,7 @@ public class E_FrameWork
 				gotAttribute = gotAttribute+""+divObj[i];
 			}
 		}
+		
 		
 		By CodePath = null;
 		
@@ -343,11 +447,15 @@ public class E_FrameWork
 		
 	}
     //END : get Object
-    
+    public void E_MyWait(int TimeSeconds)throws Exception
+    {
+    	Thread.sleep(TimeSeconds*1000);
+    	System.out.println("\nWait for : "+TimeSeconds+" Seconds.");
+    }
     //Start : Wait For Page Load
     public void E_WaitForPageLoad() throws Exception
     {
-		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		//driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 		JavascriptExecutor js = (JavascriptExecutor)driver;
 		//This loop will rotate for 100 times to check If page Is ready after every 1 second.
 	    //You can replace your if you wants to Increase or decrease wait time.
@@ -375,6 +483,7 @@ public class E_FrameWork
     {
     	try{
     		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", driver.findElement(AtrributeObj));
     		driver.findElement(AtrributeObj).sendKeys(Eexcel_HashCheck(EnterTestData));
     		System.out.println("\nEnter Value in ["+Eexcel_HashCheck(WebObjectName)+"] TextObject.");
     		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Entered Test Data :"+Eexcel_HashCheck(EnterTestData),"PASS");
@@ -382,23 +491,30 @@ public class E_FrameWork
     	{
     		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
     		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Enter Test Data :"+Eexcel_HashCheck(EnterTestData)+" [Error:Element Not Found]","FAIL");
-    		System.exit(0);
+    		//System.exit(0);
+    		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
     	}
     }
     public void E_Click(String WebObjectName) throws Exception
     {
     	try{
     		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
-    		driver.findElement(AtrributeObj).click();
+    		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", driver.findElement(AtrributeObj));
     		
+    		driver.findElement(AtrributeObj).click(); 
+    		
+    		//Highlighter BC
     		System.out.println("\nClick on ["+Eexcel_HashCheck(WebObjectName)+"] Object.");
+    		
     		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Click","PASS");
     		
     	}catch(org.openqa.selenium.NoSuchElementException NSEE)
     	{
     		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
     		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Click [Error:Element Not Found]","FAIL");
-    		System.exit(0);
+    		//EReport_CloseHTMLReport();
+    		//System.exit(0);
+    		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
     	}
     }
     public void E_Select(String WebObjectName,String ListValue) throws Exception
@@ -407,12 +523,13 @@ public class E_FrameWork
     		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
     		Select select = new Select(driver.findElement(AtrributeObj));
     		select.selectByVisibleText(Eexcel_HashCheck(ListValue));
-    		System.out.println("\nSelect ["+Eexcel_HashCheck(ListValue)+"] Value from ["+Eexcel_HashCheck(ListValue)+"] Object");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Select ["+Eexcel_HashCheck(WebObjectName)+"] Value","PASS");
+    		System.out.println("\nSelect ["+Eexcel_HashCheck(ListValue)+"] Value from ["+Eexcel_HashCheck(WebObjectName)+"] Object");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Select ["+Eexcel_HashCheck(ListValue)+"] Value","PASS");
     	}catch(org.openqa.selenium.NoSuchElementException NSEE){
     		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
     		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Select ["+Eexcel_HashCheck(ListValue)+"] Value. [Error:Element Not Found]","FAIL");
-    		System.exit(0);	
+    		//System.exit(0);	
+    		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
     	}
     }
     public void E_RunTimeChangeWebObjectValue(String WebObjectPropertyName,String WebObjectValue) throws Exception
@@ -424,28 +541,42 @@ public class E_FrameWork
  	public void E_TakeScreenShot(String Path,String FileName)throws Exception
   	{
   			String FilePathandNameP = Eexcel_HashCheck(Path)+"\\"+Eexcel_HashCheck(FileName)+".jpg";
+  			
   			File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
   			FileUtils.copyFile(scrFile, new File(FilePathandNameP));
   	}
  	
  	
-	public void ETestData_File(String PathAndFileName,String SheetName)throws Exception
+	public void ETestData_File(String PathAndFileName)throws Exception
 	{
 		try{
 			file = new File(PathAndFileName);
 		    inputStream = new FileInputStream(file);
 			srcBook = new XSSFWorkbook(inputStream);
-			sourceSheet= srcBook.getSheet(SheetName);
+			
 		}catch(FileNotFoundException FNFE)
 		{
 			System.out.println("File not found, it might be opened or not available at location.");
 		}
 	}
-
-	public String ETestData_GetData(String ColumnName,int RowNo) throws Exception
+	public void ETestData_FileSheetAndRow(String Sheet_Name,int Row_Number)
+	{
+		try{
+			sourceSheet= srcBook.getSheet(Sheet_Name);
+			rowsline= sourceSheet.getRow(Row_Number);
+		}
+		catch(NullPointerException e)
+		{
+			if(rowsline == null)
+			{
+				rowsline= sourceSheet.createRow(Row_Number);
+			}
+		}
+	}
+	
+	public String ETestData_GetData(String ColumnName) throws Exception
 	{
 			int ColInNum = Eexcel_SearchColumn(ColumnName);
-			rowsline= sourceSheet.getRow(RowNo);
 		try
 		{
 			return rowsline.getCell(ColInNum).getStringCellValue();
@@ -454,29 +585,30 @@ public class E_FrameWork
 			return null;
 		}
 	}
-	public void ETestData_SetData(String ColumnName,String Set_Data,int RowNo) throws Exception
+	public void ETestData_SetData(String ColumnName,String Set_Data) throws Exception
 	{
+		CellStyle style = srcBook.createCellStyle(); //temp color
+		Font blueFont = srcBook.createFont(); //temp color
+		blueFont.setColor(HSSFColor.BLUE.index); //temp color
+		style.setFont(blueFont); //temp color
+	    
 			int ColInNum = Eexcel_SearchColumn(ColumnName);
-			rowsline = sourceSheet.getRow(RowNo);
-			
-			if(rowsline == null)
-			{
-				rowsline= sourceSheet.createRow(RowNo);
-			}
 			XSSFCell newCell = rowsline.createCell(ColInNum);
 			newCell.setCellValue(Set_Data);
+			newCell.setCellStyle(style);//temp color
 			outputStream = new FileOutputStream(file);
 			srcBook.write(outputStream);
+			srcBook.setForceFormulaRecalculation(true);
 	}
  	public int Eexcel_SearchColumn(String ColumnName)throws Exception
  	{
  		int i=0,y=0;
- 		rowsline = sourceSheet.getRow(0); 
+ 		rowslineSearchColumn = sourceSheet.getRow(0); 
 		try
 		{
 			for(;i<=500;i++)
 			{
-				if(rowsline.getCell(i).getStringCellValue().equals(ColumnName))
+				if(rowslineSearchColumn.getCell(i).getStringCellValue().equals(ColumnName))
 				{
 					break;
 				}
@@ -485,22 +617,22 @@ public class E_FrameWork
 		}catch(NullPointerException e)
 		{
 			System.out.print("\nColumn ["+ColumnName+"] was not available, so added in Test Data File.");
-			if(rowsline == null)
+			if(rowslineSearchColumn == null)
 			{
-				rowsline= sourceSheet.createRow(0);
+				rowslineSearchColumn= sourceSheet.createRow(0);
 			}
 			try
 			{
 				for(;y<=500;y++)
 				{
-					if(rowsline.getCell(y).getStringCellValue().equals(""))
+					if(rowslineSearchColumn.getCell(y).getStringCellValue().equals(""))
 					{
 						break;
 					}
 				}
 			}catch(NullPointerException e1)
 			{
-				XSSFCell newCell = rowsline.createCell(y);
+				XSSFCell newCell = rowslineSearchColumn.createCell(y);
 				newCell.setCellValue(ColumnName);
 				outputStream = new FileOutputStream(file);
 				srcBook.write(outputStream);
@@ -513,7 +645,8 @@ public class E_FrameWork
  	}
  	public void ETestData_CloseFile() throws IOException
  	{
-		srcBook.close();
+ 		srcBook.setForceFormulaRecalculation(true); //For Excel Formula Calculation
+ 		srcBook.close();
 		inputStream.close();
 		if(outputStream != null)
 		{
@@ -526,7 +659,7 @@ public class E_FrameWork
  		try{
     		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
     		boolean eledisplay = driver.findElement(AtrributeObj).isDisplayed();
-
+    		
     		System.out.println("\nIs Element Displayed ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
     		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Displayed = "+eledisplay,"Done");
     		
@@ -616,14 +749,33 @@ public class E_FrameWork
 				}
 		}
  	}
- 	public String E_CaptureProperty(String WebObjectName,String PropertyName2Capture)throws Exception
+ 	public String E_CaptureProperty(String WebObjectName,String PropertyName2Capture,String ColumnName)throws Exception
  	{
  		String CapturedPro=null;
  		int justcheck=0;
     	try{
     		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
     		CapturedPro = driver.findElement(AtrributeObj).getAttribute(Eexcel_HashCheck(PropertyName2Capture));
-    		System.out.println("\nCaptured property for ["+Eexcel_HashCheck(WebObjectName)+"] Object, is ["+Eexcel_HashCheck(PropertyName2Capture)+" = "+CapturedPro+"].");
+    		
+    		if(ColumnName.equals(""))
+    		{
+    			System.out.println("\nCaptured attribute of ["+Eexcel_HashCheck(WebObjectName)+"] Object, ["+Eexcel_HashCheck(PropertyName2Capture)+" = "+CapturedPro+"].");
+    		}
+    		else
+    		{
+    			//To Check Whether Hash or not
+    			String FirstChar = ColumnName.substring(0,1);
+    			if(FirstChar.equals("#"))
+    			{
+    				String ColumnName2 = ColumnName.substring(1);
+    				ETestData_SetData(ColumnName2, CapturedPro);
+    			}
+    			else
+    			{
+    				ETestData_SetData(ColumnName, CapturedPro);
+    			}
+    			System.out.println("\nCaptured attribute of ["+Eexcel_HashCheck(WebObjectName)+"] Object, ["+Eexcel_HashCheck(PropertyName2Capture)+" = "+CapturedPro+"].");
+    		}
     		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Captured Property :["+Eexcel_HashCheck(PropertyName2Capture)+" = "+CapturedPro+"]","Done");
     		justcheck=1;
     	}catch(org.openqa.selenium.NoSuchElementException NSEE)
@@ -649,7 +801,7 @@ public class E_FrameWork
 		String TData = null;
 		if(FirstChar.equals("#"))
 		{
-			TData= ETestData_GetData(ColumnName,1);
+			TData= ETestData_GetData(ColumnName);
 		}
 		else
 		{
@@ -657,13 +809,36 @@ public class E_FrameWork
 		}
 		return TData;
  	}
- 	public void E_Alert_Accept()
+ 	public void E_Alert_Accept() throws Exception
  	{
  		driver.switchTo().alert().accept();
+ 		System.out.println("\nAccept Alert.");
  	}
- 	public void E_Alert_dismiss()
+ 	public void E_Alert_dismiss() throws Exception
  	{
  		driver.switchTo().alert().dismiss();
+ 		System.out.println("\nDismiss Alert.");
+ 		
+ 	}
+ 	public void E_Alert_GetText() throws Exception //NOT_ADDED_GUI
+ 	{
+ 		// Get a handle to the open alert, prompt or confirmation
+ 		Alert alert = driver.switchTo().alert();
+ 		// Get the text of the alert or prompt
+ 		System.out.println("\nAlert Text is :"+alert.getText());  
+ 	}
+ 	public void E_Switch2tab2() throws Exception //NOT_ADDED_GUI
+ 	{
+ 	    tabs2 = new ArrayList<String> (driver.getWindowHandles());
+ 	    driver.switchTo().window(tabs2.get(1));
+ 	    System.out.println("\nSwitched to Tab 2.");
+ 	}
+ 	public void E_Switch_back2maintab() throws Exception //NOT_ADDED_GUI
+ 	{
+ 		driver.close();
+ 	    driver.switchTo().window(tabs2.get(0));
+ 	    tabs2=null;
+ 	    System.out.println("\nSwitched Back to Main Tab.");
  	}
  	public void E_Switch2Frame(String FrameName) throws Exception
  	{
@@ -677,9 +852,11 @@ public class E_FrameWork
  			EReport_UpdateHTMLReport("","Switched to [ "+Eexcel_HashCheck(FrameName)+" ] frame [ERROR : Frame Not Found]","FAIL");
  		}
  	}
- 	public void E_Switch_Back()
+ 	public void E_Switch_Back2Main_Frame() throws Exception
  	{
  		driver.switchTo().defaultContent();
+ 		System.out.println("\nSwitched Back to Main Frame.");
+ 		EReport_UpdateHTMLReport("","Switched back to Main Frame.","Done");
  	}
  	public void Efile_CloseALL() throws Exception
  	{
@@ -693,4 +870,29 @@ public class E_FrameWork
 			objfile.close();
 		}
  	}
+ 	public void E_Browser_GetURL(String ColumnName) throws Exception
+ 	{
+ 		ETestData_SetData(ColumnName, driver.getCurrentUrl());
+ 		System.out.println("\nCurrent URL Captured : "+driver.getCurrentUrl());
+ 		EReport_UpdateHTMLReport("","Stored URL : "+driver.getCurrentUrl()+" in "+ColumnName+" Column.","Done");
+ 	}
+ 	public void E_Browser_Back() throws Exception
+ 	{
+ 		driver.navigate().back();
+ 		System.out.println("\nBrowser Back Operation.");
+ 		EReport_UpdateHTMLReport("","Back to previous page.","Done");
+ 	}
+ 	public void E_Browser_refresh() throws Exception
+ 	{
+ 		driver.navigate().refresh();
+ 		System.out.println("\nPage Re-Freshed.");
+ 		EReport_UpdateHTMLReport("","Refresh page.","Done");
+ 	}
+ 	public void E_Browser_forward() throws Exception
+ 	{
+ 	 	driver.navigate().forward();
+ 		System.out.println("\nBrowser Forward Operation.");
+ 		EReport_UpdateHTMLReport("","Forward to next page.","Done");
+ 	}
+
 }

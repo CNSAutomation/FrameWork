@@ -1,6 +1,6 @@
 package E_FrameWork_PKG;
 
-import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,12 +8,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
+
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -302,7 +302,6 @@ public class E_FrameWork
 				    		driver = new EdgeDriver();
 				    		browser = "\"Windows Edge\" Browser";
 			    		}
-
 			    	}
 			    	else
 			    	{
@@ -654,57 +653,7 @@ public class E_FrameWork
 			
 		}
  	}
- 	public boolean E_IsElementDisplayed(String WebObjectName) throws Exception
- 	{
- 		try{
-    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
-    		boolean eledisplay = driver.findElement(AtrributeObj).isDisplayed();
-    		
-    		System.out.println("\nIs Element Displayed ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Displayed = "+eledisplay,"Done");
-    		
-    		return eledisplay;
-    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
-    	{
-    		System.out.println("\nIs Element Displayed ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Displayed = false","Done");
-    		return false;
-    	}
- 	}
- 	public boolean E_IsElementEnabled(String WebObjectName) throws Exception
- 	{
- 		try{
-    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
-    		boolean eledisplay = driver.findElement(AtrributeObj).isEnabled();
 
-    		System.out.println("\nIs Element Enabled ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Enabled = "+eledisplay,"Done");
-    		
-    		return eledisplay;
-    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
-    	{
-    		System.out.println("\nIs Element Enabled ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Enabled = false","Done");
-    		return false;
-    	}
- 	}
- 	public boolean E_IsElementExist(String WebObjectName) throws Exception
- 	{
- 		try{
-    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
-    		boolean eledisplay = driver.findElements(AtrributeObj).size()!=0;
-
-    		System.out.println("\nIs Element Exist ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Exist = "+eledisplay+"","Done");
-    		
-    		return eledisplay;
-    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
-    	{
-    		System.out.println("\nIs Element Exist ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Exist = false","Done");
-    		return false;
-    	}
- 	}
  	public void E_WaitUntilElementDisplay(String WebObjectName) throws Exception
  	{
  		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
@@ -894,5 +843,159 @@ public class E_FrameWork
  		System.out.println("\nBrowser Forward Operation.");
  		EReport_UpdateHTMLReport("","Forward to next page.","Done");
  	}
+ 	public void E_IsElementDisplayed(String WebObjectName, String ColumnName) throws Exception
+ 	{
+ 		try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		boolean eledisplay = driver.findElement(AtrributeObj).isDisplayed();
 
+			if(ColumnName.equals(""))
+    		{
+    			System.out.println("\nIs Element Displayed ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
+    		}
+    		else
+    		{
+    			//To Check Whether Hash or not
+    			String FirstChar = ColumnName.substring(0,1);
+    			if(FirstChar.equals("#"))
+    			{
+    				String ColumnName2 = ColumnName.substring(1);
+    				ETestData_SetData(ColumnName2, ""+eledisplay);
+    			}
+    			else
+    			{
+    				ETestData_SetData(ColumnName, ""+eledisplay);
+    			}
+    			System.out.println("\nIs Element Displayed ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
+    		}
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Displayed = "+eledisplay,"Done");
+    		
+    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
+    	{
+			if(ColumnName.equals(""))
+    		{
+    			System.out.println("\nIs Element Displayed ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
+    		}
+    		else
+    		{
+    			//To Check Whether Hash or not
+    			String FirstChar = ColumnName.substring(0,1);
+    			if(FirstChar.equals("#"))
+    			{
+    				String ColumnName2 = ColumnName.substring(1);
+    				ETestData_SetData(ColumnName2, "false");
+    			}
+    			else
+    			{
+    				ETestData_SetData(ColumnName, "false");
+    			}
+    			System.out.println("\nIs Element Displayed ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
+    		}
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Displayed = false","Done");
+    	}
+ 	}
+ 	public void E_IsElementEnabled(String WebObjectName, String ColumnName) throws Exception
+ 	{
+ 		try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		boolean eledisplay = driver.findElement(AtrributeObj).isEnabled();
+
+    		if(ColumnName.equals(""))
+    		{
+    			System.out.println("\nIs Element Enabled ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
+    		}
+    		else
+    		{
+    			//To Check Whether Hash or not
+    			String FirstChar = ColumnName.substring(0,1);
+    			if(FirstChar.equals("#"))
+    			{
+    				String ColumnName2 = ColumnName.substring(1);
+    				ETestData_SetData(ColumnName2, ""+eledisplay);
+    			}
+    			else
+    			{
+    				ETestData_SetData(ColumnName, ""+eledisplay);
+    			}
+    			System.out.println("\nIs Element Enabled ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
+    		}
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Enabled = "+eledisplay,"Done");
+    		
+    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
+    	{
+    		if(ColumnName.equals(""))
+    		{
+    			System.out.println("\nIs Element Enabled ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
+    		}
+    		else
+    		{
+    			//To Check Whether Hash or not
+    			String FirstChar = ColumnName.substring(0,1);
+    			if(FirstChar.equals("#"))
+    			{
+    				String ColumnName2 = ColumnName.substring(1);
+    				ETestData_SetData(ColumnName2, "false");
+    			}
+    			else
+    			{
+    				ETestData_SetData(ColumnName, "false");
+    			}
+    			System.out.println("\nIs Element Enabled ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
+    		}
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Enabled = false","Done");
+    	}
+ 	}
+ 	public void E_IsElementExist(String WebObjectName,String ColumnName) throws Exception
+ 	{
+ 		try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		boolean eledisplay = driver.findElements(AtrributeObj).size()!=0;
+
+    		if(ColumnName.equals(""))
+    		{
+    			System.out.println("\nIs Element Exist ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
+    		}
+    		else
+    		{
+    			//To Check Whether Hash or not
+    			String FirstChar = ColumnName.substring(0,1);
+    			if(FirstChar.equals("#"))
+    			{
+    				String ColumnName2 = ColumnName.substring(1);
+    				ETestData_SetData(ColumnName2, ""+eledisplay);
+    			}
+    			else
+    			{
+    				ETestData_SetData(ColumnName, ""+eledisplay);
+    			}
+    			System.out.println("\nIs Element Exist ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
+    		}
+
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Exist = "+eledisplay+"","Done");
+    		
+    		
+    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
+    	{
+    		if(ColumnName.equals(""))
+    		{
+    			System.out.println("\nIs Element Exist ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
+    		}
+    		else
+    		{
+    			//To Check Whether Hash or not
+    			String FirstChar = ColumnName.substring(0,1);
+    			if(FirstChar.equals("#"))
+    			{
+    				String ColumnName2 = ColumnName.substring(1);
+    				ETestData_SetData(ColumnName2, "false");
+    			}
+    			else
+    			{
+    				ETestData_SetData(ColumnName, "false");
+    			}
+    			System.out.println("\nIs Element Exist ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
+    		}
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Exist = false","Done");
+    	}
+ 	}
 }

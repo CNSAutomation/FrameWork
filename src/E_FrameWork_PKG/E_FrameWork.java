@@ -8,23 +8,22 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Properties;
-
-
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchFrameException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +48,11 @@ public class E_FrameWork
 	 //Object properties Variables 
 	Properties objpro = null;
 	FileInputStream objfile;
+	
+	//Object Driver properties Variables 
+	Properties objdriver = null;
+	FileInputStream objfiledriver;
+	
 	
 	//HTML Report
 	BufferedWriter bwhtml;
@@ -112,10 +116,10 @@ public class E_FrameWork
 				+ "<br>"
 				+ "<table align=\"center\"  border=\"1\" style=\"width:70%\">"
 				+ "<tr>"
-				+ "<th style=\"width:10%\" bgcolor=\"#AFAAA9\">Step No.</th>"
-				+ "<th style=\"width:20%\" bgcolor=\"#AFAAA9\">Object Name</th>"
-				+ "<th style=\"width:30%\" bgcolor=\"#AFAAA9\">Action</th>"
-				+ "<th style=\"width:10%\" bgcolor=\"#AFAAA9\">Result</th>"
+				+ "<th style=\"width:10%\" bgcolor=\"#AFAAA9\">STEP NO.</th>"
+				+ "<th style=\"width:20%\" bgcolor=\"#AFAAA9\">ACTION</th>"
+				+ "<th style=\"width:30%\" bgcolor=\"#AFAAA9\">OBJECT</th>"
+				+ "<th style=\"width:10%\" bgcolor=\"#AFAAA9\">RESULT</th>"
 				+ "</tr>";
 		bwhtml.write(Hearder);
 		dpass=0;
@@ -159,8 +163,8 @@ public class E_FrameWork
 		StepNo=StepNo+1;
     	String DataTest1="<tr>"
 				+ "<td align=\"center\">"+StepNo+"</th>"
-				+ "<td align=\"center\">"+WebObjectName+"</th>"
-				+ "<td align=\"center\">"+Action+"</th>";
+				+ "<td align=\"center\">"+Action+"</th>"
+				+ "<td align=\"center\">"+WebObjectName+"</th>";
 		
 		
 		bwhtml.write(DataTest1);
@@ -256,51 +260,73 @@ public class E_FrameWork
 		    		
 			    	//brow=Integer.parseInt(objpro.getProperty("Browser"));
 
+	    			//Get Default Folder Path
+		    		//File currentDirectory = new File(new File(".").getAbsolutePath());
+		    		//final String dir2 = currentDirectory.getCanonicalPath()+"\\";
+	    			
+	    			
+		    		String dir2 = E_FrameWork.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		    		
+		    		dir2 = dir2.substring(1);
+		    		dir2 = dir2.replaceAll("%20", " ");
+		    		dir2 = dir2.replaceAll("E_Frame.jar", "");
+		    		//START : GET DRIVER OBJECT FILE.
+		    		try{
+		    			//System.out.println("\n\n Driver Files PATH : "+dir2+"");
+		    			objdriver = new Properties();
+		    			objfiledriver = new FileInputStream(dir2+"Drivers.Properties");
+		    			
+		    			objdriver.load(objfiledriver); 
+		    			
+		    	    	}catch(FileNotFoundException FNFE)
+		    	    	{
+		    	    		System.out.println("\nFile Driver Properties File Not Found.");
+		    	    	}
+		    		//END : GET DRIVER OBJECT FILE.
+	    			
 			    	if(brow>=1 && brow<=4)
 			    	{
+			    		
 			    		switch(brow)
 			    		{
 			    			case 1:
 			    				//Firefox
-			    				System.setProperty("webdriver.gecko.driver", "C:\\E_FrameWork\\Automation JARS_Drivers\\Browser Drivers\\geckodriver.exe");
+			    				System.setProperty("webdriver.gecko.driver", objdriver.getProperty("Firefox_Driver"));
 			    				System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
-			    				
 			    			break;
 			    			case 2:
 			    				//IE
-			    			
-			    				System.setProperty("webdriver.ie.driver", "C:\\E_FrameWork\\Automation JARS_Drivers\\Browser Drivers\\IEDriverServer.exe");
-			    				
+			    				System.setProperty("webdriver.ie.driver", objdriver.getProperty("IE_Driver"));
 			    			break;
 			    			case 3:
 			    				//Chrome
-			    				System.setProperty("webdriver.chrome.driver", "C:\\E_FrameWork\\Automation JARS_Drivers\\Browser Drivers\\chromedriver.exe");
+			    				System.setProperty("webdriver.chrome.driver", objdriver.getProperty("Chrome_Driver"));
 			    			break;
 			    			case 4:
 			    				//Edge
-			    				System.setProperty("webdriver.edge.driver", "C:\\E_FrameWork\\Automation JARS_Drivers\\Browser Drivers\\MicrosoftWebDriver_3.exe");
+			    				System.setProperty("webdriver.edge.driver", objdriver.getProperty("Edge_Driver"));
 			    			break;
 			    		}
 			    		
 			    		if(brow==1)
 			    		{
 			    			driver=new FirefoxDriver();
-			    			browser="\"Firefox\" Browser";
+			    			browser="FIREFOX";
 			    		}
 			    		else if(brow==2)
 			    		{
 			    			driver=new InternetExplorerDriver();
-			    			browser="\"Internet Explorer\" Browser";
+			    			browser="INTERNET EXPLORER";
 			    		}
 			    		else if(brow==3)
 			    		{
 			    			driver=new ChromeDriver();
-			    			browser="\"Chrome\" Browser";
+			    			browser="CHROME";
 			    		}
 			    		else if(brow==4)
 			    		{
 				    		driver = new EdgeDriver();
-				    		browser = "\"Windows Edge\" Browser";
+				    		browser = "WINDOWS EDGE";
 			    		}
 			    	}
 			    	else
@@ -321,12 +347,12 @@ public class E_FrameWork
 	    			driver.manage().window().maximize();
 	    			driver.get(Eexcel_HashCheck(url));
 			    	System.out.println("\nInvoke \""+browser+"\" Browser, Opening \'"+Eexcel_HashCheck(url)+"\' URL.");
-			    	EReport_UpdateHTMLReport(browser,"Invoke \""+browser+"\" Browser","PASS");
-			    	EReport_UpdateHTMLReport(browser,"Opening \""+Eexcel_HashCheck(url)+"\" URL.","PASS");
+			    	EReport_UpdateHTMLReport(browser,"OPEN BROWSER","PASS");
+			    	EReport_UpdateHTMLReport(browser,"OPEN URL (\""+Eexcel_HashCheck(url)+"\")","PASS");
 	    		}catch(org.openqa.selenium.InvalidArgumentException | java.lang.NullPointerException IAE){
 	    			System.out.println("\nInvalid URL, cannot open ["+Eexcel_HashCheck(url)+"] this URL.");
-	    			EReport_UpdateHTMLReport(browser,"Invoke \""+browser+"\" Browser","FAIL");
-	    			EReport_UpdateHTMLReport(browser,"Opening \""+Eexcel_HashCheck(url)+"\" URL.","FAIL");
+			    	EReport_UpdateHTMLReport(browser,"OPEN BROWSER","FAIL");
+			    	EReport_UpdateHTMLReport(browser,"OPEN URL (\""+Eexcel_HashCheck(url)+"\")","FAIL");
 	    			throw new java.io.FileNotFoundException("");
 	    			
 	    			//System.exit(0);
@@ -337,10 +363,10 @@ public class E_FrameWork
 	    		try{
 	    		driver.navigate().to(Eexcel_HashCheck(url));
 	    		System.out.println("\nRedirected to : \'"+Eexcel_HashCheck(url)+"\' URL.");
-	    		EReport_UpdateHTMLReport("Navigation","Redirect URL to :"+Eexcel_HashCheck(url),"PASS");
+	    		EReport_UpdateHTMLReport("BROWSER","OPEN URL (\""+Eexcel_HashCheck(url)+"\")","PASS");
 	    		}catch(org.openqa.selenium.InvalidArgumentException IAE){
 	    			System.out.println("\nInvalid URL, cannot redirect to ["+Eexcel_HashCheck(url)+"] this URL.");
-	    			EReport_UpdateHTMLReport("Navigation","Redirect URL to :"+Eexcel_HashCheck(url),"FAIL");
+	    			EReport_UpdateHTMLReport("BROWSER","OPEN URL (\""+Eexcel_HashCheck(url)+"\")","FAIL");
 	    			//System.exit(0);
 	    		}
 	    	}
@@ -474,7 +500,7 @@ public class E_FrameWork
 	        }   
 	    }
 	    System.out.println("\nWeb-Page Loaded.");
-	    EReport_UpdateHTMLReport("","Wait For Page Load","Done");
+	    EReport_UpdateHTMLReport("","WAIT FOR PAGE LOAD","Done");
     }
     //END : Wait For Page Load
     
@@ -485,11 +511,13 @@ public class E_FrameWork
     		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", driver.findElement(AtrributeObj));
     		driver.findElement(AtrributeObj).sendKeys(Eexcel_HashCheck(EnterTestData));
     		System.out.println("\nEnter Value in ["+Eexcel_HashCheck(WebObjectName)+"] TextObject.");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Entered Test Data :"+Eexcel_HashCheck(EnterTestData),"PASS");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"WRITE [TEST DATA : \""+Eexcel_HashCheck(EnterTestData)+"\"]","PASS");
     	}catch(org.openqa.selenium.NoSuchElementException NSEE)
     	{
     		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Enter Test Data :"+Eexcel_HashCheck(EnterTestData)+" [Error:Element Not Found]","FAIL");
+    		
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"WRITE <BR> [TEST DATA : \""+Eexcel_HashCheck(EnterTestData)+"\"]) <BR> [ERROR:ELEMENT NOT FOUND]","FAIL");
+    		
     		//System.exit(0);
     		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
     	}
@@ -500,17 +528,28 @@ public class E_FrameWork
     		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
     		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", driver.findElement(AtrributeObj));
     		
-    		driver.findElement(AtrributeObj).click(); 
+    		//((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(AtrributeObj));
+    		//driver.findElement(AtrributeObj).click(); 
+    		//driver.findElement(AtrributeObj).sendKeys(Keys.SPACE);
+    		
+    		Actions action = new Actions(driver);
+    		action.moveToElement(driver.findElement(AtrributeObj)).click(driver.findElement(AtrributeObj)).build().perform();
+    		
+    		
+			 //Actions act = new Actions(driver);
+			 //act.moveToElement(driver.findElement(AtrributeObj)).doubleClick().build().perform();
+			 
+    		//driver.findElement(AtrributeObj).submit();
     		
     		//Highlighter BC
     		System.out.println("\nClick on ["+Eexcel_HashCheck(WebObjectName)+"] Object.");
     		
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Click","PASS");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"CLICK","PASS");
     		
     	}catch(org.openqa.selenium.NoSuchElementException NSEE)
     	{
     		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Click [Error:Element Not Found]","FAIL");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"CLICK <BR> [ERROR:ELEMENT NOT FOUND]","FAIL");
     		//EReport_CloseHTMLReport();
     		//System.exit(0);
     		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
@@ -523,10 +562,11 @@ public class E_FrameWork
     		Select select = new Select(driver.findElement(AtrributeObj));
     		select.selectByVisibleText(Eexcel_HashCheck(ListValue));
     		System.out.println("\nSelect ["+Eexcel_HashCheck(ListValue)+"] Value from ["+Eexcel_HashCheck(WebObjectName)+"] Object");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Select ["+Eexcel_HashCheck(ListValue)+"] Value","PASS");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"SELECT <BR> [TEST DATA : \""+Eexcel_HashCheck(ListValue)+"\"]","PASS");
     	}catch(org.openqa.selenium.NoSuchElementException NSEE){
     		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Select ["+Eexcel_HashCheck(ListValue)+"] Value. [Error:Element Not Found]","FAIL");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"SELECT <BR> [TEST DATA : \""+Eexcel_HashCheck(ListValue)+"\"] <BR> [ERROR:ELEMENT NOT FOUND]","FAIL");
+    		
     		//System.exit(0);	
     		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
     	}
@@ -575,7 +615,7 @@ public class E_FrameWork
 	
 	public String ETestData_GetData(String ColumnName) throws Exception
 	{
-			int ColInNum = Eexcel_SearchColumn(ColumnName);
+		int ColInNum = Eexcel_SearchColumn(ColumnName);
 		try
 		{
 			return rowsline.getCell(ColInNum).getStringCellValue();
@@ -725,12 +765,12 @@ public class E_FrameWork
     			}
     			System.out.println("\nCaptured attribute of ["+Eexcel_HashCheck(WebObjectName)+"] Object, ["+Eexcel_HashCheck(PropertyName2Capture)+" = "+CapturedPro+"].");
     		}
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Captured Property :["+Eexcel_HashCheck(PropertyName2Capture)+" = "+CapturedPro+"]","Done");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"CAPTURE WEB-ELEMENT ATTRIBUTE <BR> ["+Eexcel_HashCheck(PropertyName2Capture)+" = "+CapturedPro+"]","Done");
     		justcheck=1;
     	}catch(org.openqa.selenium.NoSuchElementException NSEE)
     	{
     		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Capture Property :"+Eexcel_HashCheck(PropertyName2Capture)+" [Error:Element Not Found]","FAIL");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"CAPTURE WEB-ELEMENT ATTRIBUTE <BR> ["+Eexcel_HashCheck(PropertyName2Capture)+" = "+CapturedPro+"] <BR> [ERROR:ELEMENT NOT FOUND]","FAIL");
     	}
     	if(justcheck==1)
     	{
@@ -794,18 +834,18 @@ public class E_FrameWork
  		try{
  			driver.switchTo().frame(Eexcel_HashCheck(FrameName));
  			System.out.println("\nSwitched to ["+Eexcel_HashCheck(FrameName)+"] frame.");
- 			EReport_UpdateHTMLReport("","Switched to [ "+Eexcel_HashCheck(FrameName)+" ] frame.","Done");
+ 			EReport_UpdateHTMLReport("","SWITCH TO FRAME <BR> [FRAME = \""+Eexcel_HashCheck(FrameName)+"\"]","Done");
  		}catch(NoSuchFrameException NSFE)
  		{
  			System.out.println("\n["+Eexcel_HashCheck(FrameName)+"] frame not found.");
- 			EReport_UpdateHTMLReport("","Switched to [ "+Eexcel_HashCheck(FrameName)+" ] frame [ERROR : Frame Not Found]","FAIL");
+ 			EReport_UpdateHTMLReport("","SWITCH TO FRAME <BR> [FRAME = \""+Eexcel_HashCheck(FrameName)+"\"] <BR> [ERROR : FRAME NOT FOUND","FAIL");
  		}
  	}
  	public void E_Switch_Back2Main_Frame() throws Exception
  	{
  		driver.switchTo().defaultContent();
  		System.out.println("\nSwitched Back to Main Frame.");
- 		EReport_UpdateHTMLReport("","Switched back to Main Frame.","Done");
+ 		EReport_UpdateHTMLReport("","SWITCH BACK TO MAIN FRAME","Done");
  	}
  	public void Efile_CloseALL() throws Exception
  	{
@@ -823,25 +863,25 @@ public class E_FrameWork
  	{
  		ETestData_SetData(ColumnName, driver.getCurrentUrl());
  		System.out.println("\nCurrent URL Captured : "+driver.getCurrentUrl());
- 		EReport_UpdateHTMLReport("","Stored URL : "+driver.getCurrentUrl()+" in "+ColumnName+" Column.","Done");
+ 		EReport_UpdateHTMLReport("","GET CURRENT URL <BR> [URL : \""+driver.getCurrentUrl()+"\"] <BR> STORE IN  [TEST DATA COLUMN  : "+ColumnName+"]","Done");
  	}
  	public void E_Browser_Back() throws Exception
  	{
  		driver.navigate().back();
  		System.out.println("\nBrowser Back Operation.");
- 		EReport_UpdateHTMLReport("","Back to previous page.","Done");
+ 		EReport_UpdateHTMLReport("","BACK TO PREVIOUSE PAGE","Done");
  	}
  	public void E_Browser_refresh() throws Exception
  	{
  		driver.navigate().refresh();
  		System.out.println("\nPage Re-Freshed.");
- 		EReport_UpdateHTMLReport("","Refresh page.","Done");
+ 		EReport_UpdateHTMLReport("","REFRESH PAGE","Done");
  	}
  	public void E_Browser_forward() throws Exception
  	{
  	 	driver.navigate().forward();
  		System.out.println("\nBrowser Forward Operation.");
- 		EReport_UpdateHTMLReport("","Forward to next page.","Done");
+ 		EReport_UpdateHTMLReport("","FORWARD TO NEXT PAGE","Done");
  	}
  	public void E_IsElementDisplayed(String WebObjectName, String ColumnName) throws Exception
  	{
@@ -868,7 +908,7 @@ public class E_FrameWork
     			}
     			System.out.println("\nIs Element Displayed ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
     		}
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Displayed = "+eledisplay,"Done");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"CHECK WEB-ELEMENT DISPLAY <BR> [RESULT = \""+eledisplay+"\"]","Done");
     		
     	}catch(org.openqa.selenium.NoSuchElementException NSEE)
     	{
@@ -891,7 +931,7 @@ public class E_FrameWork
     			}
     			System.out.println("\nIs Element Displayed ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
     		}
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Displayed = false","Done");
+			EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"CHECK WEB-ELEMENT DISPLAY <BR> [RESULT = \"false\"]","Done");
     	}
  	}
  	public void E_IsElementEnabled(String WebObjectName, String ColumnName) throws Exception
@@ -919,7 +959,7 @@ public class E_FrameWork
     			}
     			System.out.println("\nIs Element Enabled ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
     		}
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Enabled = "+eledisplay,"Done");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"CHECK WEB-ELEMENT ENABLE <BR> [RESULT = \""+eledisplay+"\"]","Done");
     		
     	}catch(org.openqa.selenium.NoSuchElementException NSEE)
     	{
@@ -942,9 +982,46 @@ public class E_FrameWork
     			}
     			System.out.println("\nIs Element Enabled ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
     		}
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Enabled = false","Done");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"CHECK WEB-ELEMENT ENABLE <BR> [RESULT = \"false\"]","Done");
     	}
  	}
+ 	public boolean IS_ELEMENT_EXIST(String WebObjectName) throws Exception
+ 	{
+ 		try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		boolean eledisplay = driver.findElements(AtrributeObj).size()!=0;
+    		
+    		return eledisplay;
+ 		}catch(org.openqa.selenium.NoSuchElementException NSEE)
+ 		{
+ 			return false;
+ 		}
+ 		
+ 	}
+ 	public boolean IS_ELEMENT_DISPLAY(String WebObjectName) throws Exception
+ 	{
+ 		try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		boolean eledisplay = driver.findElement(AtrributeObj).isDisplayed();
+    		
+    		return eledisplay;
+ 		}catch(org.openqa.selenium.NoSuchElementException NSEE)
+ 		{
+ 			return false;
+ 		}
+ 		
+ 	}
+	public String Excel_GetData(String ColumnName) throws Exception
+	{
+			int ColInNum = Eexcel_SearchColumn(ColumnName);
+		try
+		{
+			return rowsline.getCell(ColInNum).getStringCellValue();
+		}catch(NullPointerException e)
+		{
+			return null;
+		}
+	}
  	public void E_IsElementExist(String WebObjectName,String ColumnName) throws Exception
  	{
  		try{
@@ -971,7 +1048,7 @@ public class E_FrameWork
     			System.out.println("\nIs Element Exist ["+Eexcel_HashCheck(WebObjectName)+" = "+eledisplay+"].");
     		}
 
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Exist = "+eledisplay+"","Done");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"CHECK WEB-ELEMENT EXIST <BR> [RESULT = \""+eledisplay+"\"]","Done");
     		
     		
     	}catch(org.openqa.selenium.NoSuchElementException NSEE)
@@ -995,7 +1072,166 @@ public class E_FrameWork
     			}
     			System.out.println("\nIs Element Exist ["+ Eexcel_HashCheck(WebObjectName) +" = False].");
     		}
-    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Check Element Exist = false","Done");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"CHECK WEB-ELEMENT EXIST <BR> [RESULT = \"false\"]","Done");
+    		
     	}
  	}
+    public void E_Click_JavaScript(String WebObjectName) throws Exception
+    {
+    	try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", driver.findElement(AtrributeObj));
+
+    		  		
+    		JavascriptExecutor executor = (JavascriptExecutor)driver;
+    		executor.executeScript("arguments[0].click();", driver.findElement(AtrributeObj));
+    		
+    		//Highlighter BC
+    		System.out.println("\nJavaScript Click on ["+Eexcel_HashCheck(WebObjectName)+"] Object.");
+    		
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"JS CLICK","PASS");
+    		
+    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
+    	{
+    		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"JS CLICK <BR> [ERROR:ELEMENT NOT FOUND]","FAIL");
+    		//EReport_CloseHTMLReport();
+    		//System.exit(0);
+    		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
+    	}
+    }
+    public void E_Click_MouseClick(String WebObjectName) throws Exception
+    {
+    	try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", driver.findElement(AtrributeObj));
+
+    		
+    		Actions action = new Actions(driver);
+    		action.moveToElement(driver.findElement(AtrributeObj)).click(driver.findElement(AtrributeObj)).build().perform();
+
+    		//Highlighter BC
+    		System.out.println("\nMouseClick on ["+Eexcel_HashCheck(WebObjectName)+"] Object.");
+    		
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"MCLICK","PASS");
+    		
+    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
+    	{
+    		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"MCLICK <BR> [ERROR:ELEMENT NOT FOUND]","FAIL");
+    		//EReport_CloseHTMLReport();
+    		//System.exit(0);
+    		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
+    	}
+    }
+    public void E_Click_DoubleClick(String WebObjectName) throws Exception
+    {
+    	try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", driver.findElement(AtrributeObj));
+
+    		
+    		Actions action = new Actions(driver);
+    		action.doubleClick(driver.findElement(AtrributeObj)).build().perform();
+    		
+    		//Highlighter BC
+    		System.out.println("\nMouseClick on ["+Eexcel_HashCheck(WebObjectName)+"] Object.");
+    		
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"MCLICK","PASS");
+    		
+    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
+    	{
+    		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"MCLICK <BR> [ERROR:ELEMENT NOT FOUND]","FAIL");
+    		//EReport_CloseHTMLReport();
+    		//System.exit(0);
+    		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
+    	}
+    }
+    
+    public void E_Key_Enter(String WebObjectName) throws Exception
+    {
+    	try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", driver.findElement(AtrributeObj));
+
+    		
+    		driver.findElement(AtrributeObj).sendKeys(Keys.ENTER);
+    		
+    		//Highlighter BC
+    		System.out.println("\nHit Enter on ["+Eexcel_HashCheck(WebObjectName)+"] Object.");
+    		
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Hit - Enter","PASS");
+    		
+    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
+    	{
+    		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Hit - Enter <BR> [ERROR:ELEMENT NOT FOUND]","FAIL");
+    		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
+    	}
+    }
+    public void E_Key_Space(String WebObjectName) throws Exception
+    {
+    	try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", driver.findElement(AtrributeObj));
+
+    		
+    		driver.findElement(AtrributeObj).sendKeys(Keys.SPACE);
+    		
+    		//Highlighter BC
+    		System.out.println("\nHit Space on ["+Eexcel_HashCheck(WebObjectName)+"] Object.");
+    		
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Hit - Space","PASS");
+    		
+    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
+    	{
+    		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
+			EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Hit - Space <BR> [ERROR:ELEMENT NOT FOUND]","FAIL");
+    		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
+    	}
+    }
+	public void E_Key_Escape(String WebObjectName) throws Exception
+    {
+    	try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", driver.findElement(AtrributeObj));
+
+    		
+    		driver.findElement(AtrributeObj).sendKeys(Keys.ESCAPE);
+    		
+    		//Highlighter BC
+    		System.out.println("\nHit Escape on ["+Eexcel_HashCheck(WebObjectName)+"] Object.");
+    		
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Hit - Escape","PASS");
+    		
+    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
+    	{
+    		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
+			EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Hit - Escape <BR> [ERROR:ELEMENT NOT FOUND]","FAIL");
+    		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
+    	}
+    }
+	public void E_Key_Tab(String WebObjectName) throws Exception
+    {
+    	try{
+    		By AtrributeObj = E_GetObject(Eexcel_HashCheck(WebObjectName));
+    		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid red'", driver.findElement(AtrributeObj));
+
+    		
+    		driver.findElement(AtrributeObj).sendKeys(Keys.TAB);
+    		
+    		//Highlighter BC
+    		System.out.println("\nHit Tab on ["+Eexcel_HashCheck(WebObjectName)+"] Object.");
+    		
+    		EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Hit - Tab","PASS");
+    		
+    	}catch(org.openqa.selenium.NoSuchElementException NSEE)
+    	{
+    		System.out.println("\n\""+Eexcel_HashCheck(WebObjectName)+"\" Element not found.");
+			EReport_UpdateHTMLReport(Eexcel_HashCheck(WebObjectName),"Hit - Tab <BR> [ERROR:ELEMENT NOT FOUND]","FAIL");
+    		throw new org.openqa.selenium.NoSuchElementException("Element Not Found");
+    	}
+    }
+    
 }
